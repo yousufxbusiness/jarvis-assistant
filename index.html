@@ -1,11 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>JARVIS AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S. Command Center</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#030712;color:#e5f3ff;
+ font-family:Arial,sans-serif;
+}
+header{
+ padding:18px 25px;border-bottom:1px solid #123b60;
+ display:flex;justify-content:space-between;align-items:center;
+}
+.logo{color:#00c8ff;font-size:24px;font-weight:bold}
+.status{color:#00ffae;font-size:12px}
+.layout{
+ display:grid;grid-template-columns:210px 1fr;
+ min-height:90vh;
+}
+nav{
+ padding:20px 12px;border-right:1px solid #123b60;
+}
+nav button{
+ display:block;width:100%;padding:14px;margin-bottom:8px;
+ background:transparent;border:1px solid transparent;
+ color:#a9c9e8;text-align:left;border-radius:8px;
+ cursor:pointer;
+}
+nav button:hover,nav button.active{
+ background:#092443;border-color:#008cff;color:#00c8ff;
+}
+main{padding:22px;min-width:0}
+h2{font-size:17px;color:#8ccfff}
+.grid{
+ display:grid;grid-template-columns:1.2fr 1fr;
+ gap:18px;
+}
+.panel{
+ background:linear-gradient(145deg,#09172b,#061020);
+ border:1px solid #123b60;border-radius:14px;
+ padding:18px;box-shadow:0 0 20px #001b3b;
+}
+.core-area{
+ min-height:340px;display:flex;align-items:center;
+ justify-content:center;flex-direction:column;
+}
+.core{
+ width:165px;height:165px;border-radius:50%;
+ border:2px solid #00c8ff;
+ box-shadow:0 0 20px #008cff, inset 0 0 30px #0077ff;
+ display:flex;align-items:center;justify-content:center;
+ position:relative;animation:pulse 3s infinite;
+}
+.core:before,.core:after{
+ content:"";position:absolute;border-radius:50%;
+ border:1px solid #00aaff;
+}
+.core:before{inset:-15px;animation:rotate 8s linear infinite}
+.core:after{inset:-30px;border-style:dashed;animation:rotate 14s linear infinite reverse}
+.core span{font-size:30px;color:#00d9ff;font-weight:bold}
+@keyframes pulse{
+ 50%{box-shadow:0 0 45px #008cff,inset 0 0 40px #0077ff}
+}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.state{color:#00d9ff;margin-top:35px;letter-spacing:3px}
+.small{font-size:12px;color:#7197b9}
+.chat{
+ height:320px;overflow:auto;padding:10px;
+ background:#030b18;border-radius:9px;
+}
+.msg{
+ padding:10px 13px;margin:9px 0;
+ border-radius:10px;max-width:90%;font-size:14px;
+ line-height:1.5;
+}
+.bot{background:#09294a;border-left:3px solid #00c8ff}
+.user{background:#123c48;margin-left:auto;border-right:3px solid #00ffae}
+.inputrow{display:flex;gap:7px;margin-top:12px}
+input{
+ min-width:0;flex:1;background:#020b18;color:white;
+ border:1px solid #17608c;border-radius:8px;padding:12px;
+}
+button.action{
+ background:#007bc5;color:white;border:0;
+ border-radius:8px;padding:11px 15px;cursor:pointer;
+}
+button.action:hover{background:#00aaff}
+.mic{background:#064c67!important}
+.activity{
+ padding:12px;border-bottom:1px solid #123b60;
+ font-size:13px;color:#b7d7ef;
+}
+.dot{color:#00ffae}
+.permission{
+ border:1px solid #a77b25;background:#241b0b;
+ padding:12px;border-radius:8px;margin-top:10px;
+}
+.permission button{margin:8px 5px 0 0}
+.stats{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:10px;margin-top:18px;
+}
+.stat{
+ background:#071a30;padding:13px;border-radius:9px;
+ border:1px solid #123b60;
+}
+.stat strong{display:block;color:#00c8ff;font-size:20px}
+footer{text-align:center;color:#476783;padding:20px;font-size:11px}
+@media(max-width:750px){
+ .layout{grid-template-columns:1fr}
+ nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid #123b60}
+ nav button{min-width:115px;text-align:center}
+ .grid{grid-template-columns:1fr}
+ main{padding:12px}
+ .stats{grid-template-columns:1fr 1fr}
+ header{padding:15px}
+}
+</style>
 </head>
-<body style="background:#050816;color:#00bfff;text-align:center;font-family:Arial;padding:40px">
-  <h1>J.A.R.V.I.S.</h1>
-  <h2>PERSONAL AI ASSISTANT</h2>
-  <p>JARVIS Command Center is online.</p>
+
+<body>
+
+<header>
+ <div class="logo">◉ J.A.R.V.I.S.</div>
+ <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<div class="layout">
+
+<nav>
+ <button class="active">◈ Dashboard</button>
+ <button onclick="document.getElementById('chatbox').scrollIntoView()">◉ AI Chat</button>
+ <button onclick="startVoice()">🎙 Voice Assistant</button>
+ <button onclick="showMessage('WhatsApp connection is not configured yet.')">▣ WhatsApp</button>
+ <button onclick="showMessage('Media tools will be connected later.')">▧ Media Studio</button>
+ <button onclick="showMessage('Settings are coming soon.')">⚙ Settings</button>
+</nav>
+
+<main>
+
+<h2>COMMAND CENTER / OVERVIEW</h2>
+
+<div class="grid">
+
+<section class="panel core-area">
+ <div class="core"><span>J</span></div>
+ <div class="state" id="state">STANDBY</div>
+ <p class="small">PERSONAL AI ASSISTANT</p>
+ <button class="action mic" onclick="startVoice()">🎙 ACTIVATE VOICE</button>
+</section>
+
+<section class="panel" id="chatbox">
+ <h2>AI COMMUNICATION</h2>
+ <div class="chat" id="chat">
+  <div class="msg bot">
+   Hello! I am JARVIS.<br>
+   Your personal assistant is ready.
+  </div>
+ </div>
+ <div class="inputrow">
+  <input id="command" placeholder="Talk to JARVIS..." 
+   onkeydown="if(event.key==='Enter')sendMessage()">
+  <button class="action" onclick="sendMessage()">➤</button>
+ </div>
+ <p class="small">Text and voice interface • Demo mode</p>
+</section>
+
+<section class="panel">
+ <h2>LIVE ACTIVITY</h2>
+ <div class="activity"><span class="dot">●</span> Dashboard initialized</div>
+ <div class="activity" id="activity">Waiting for your command...</div>
+ <div class="activity">Next: Awaiting instruction</div>
+ <h2>SYSTEM STATUS</h2>
+ <div class="stats">
+  <div class="stat"><strong>ONLINE</strong><small>Website</small></div>
+  <div class="stat"><strong>READY</strong><small>Interface</small></div>
+  <div class="stat"><strong>--</strong><small>AI Backend</small></div>
+ </div>
+</section>
+
+<section class="panel">
+ <h2>PERMISSION CENTER</h2>
+ <p class="small">Tasks requiring permission will appear here.</p>
+ <div class="permission">
+  <strong>🔐 No pending requests</strong>
+  <p class="small">JARVIS will request permission before supported actions.</p>
+ </div>
+ <h2>CONNECTIONS</h2>
+ <div class="activity">● Website: Connected</div>
+ <div class="activity">○ AI Brain: Not connected</div>
+ <div class="activity">○ WhatsApp: Not connected</div>
+ <div class="activity">○ TV Box Control: Not connected</div>
+</section>
+
+</div>
+</main>
+</div>
+
+<footer>J.A.R.V.I.S. PERSONAL COMMAND CENTER • PROTOTYPE</footer>
+
+<script>
+const state=document.getElementById("state");
+const chat=document.getElementById("chat");
+const activity=document.getElementById("activity");
+
+function setState(s){
+ state.textContent=s;
+}
+
+function addMessage(text,type){
+ const div=document.createElement("div");
+ div.className="msg "+type;
+ div.textContent=text;
+ chat.appendChild(div);
+ chat.scrollTop=chat.scrollHeight;
+}
+
+function reply(text){
+ addMessage(text,"bot");
+ if("speechSynthesis" in window){
+  speechSynthesis.cancel();
+  const speech=new SpeechSynthesisUtterance(text);
+  speech.lang=/[\u0980-\u09FF]/.test(text)?"bn-BD":"en-US";
+  speechSynthesis.speak(speech);
+ }
+}
+
+function sendMessage(){
+ const input=document.getElementById("command");
+ const text=input.value.trim();
+ if(!text)return;
+
+ addMessage(text,"user");
+ input.value="";
+ setState("THINKING");
+ activity.textContent="Processing your message...";
+ 
+ setTimeout(()=>{
+  setState("STANDBY");
+  activity.textContent="Demo response generated.";
+  let answer;
+
+  if(/hello|hi|hey/i.test(text)){
+   answer="Hello! I am JARVIS. How can I help you?";
+  }else if(/হ্যালো|কেমন|আছিস|আছেন/.test(text)){
+   answer="হ্যালো! আমি JARVIS। বলো, কীভাবে সাহায্য করতে পারি?";
+  }else{
+   answer="আমি তোমার নির্দেশ পেয়েছি। তবে আসল AI Brain এখনো সংযুক্ত করা হয়নি।";
+  }
+  reply(answer);
+ },900);
+}
+
+function startVoice(){
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+  reply("Voice recognition is not supported by this browser. Please use text chat.");
+  return;
+ }
+ const recognition=new SpeechRecognition();
+ recognition.lang="bn-BD";
+ recognition.interimResults=false;
+ setState("LISTENING");
+ activity.textContent="Listening for your voice...";
+ recognition.onresult=function(event){
+  document.getElementById("command").value=event.results[0][0].transcript;
+  setState("THINKING");
+  sendMessage();
+ };
+ recognition.onerror=function(){
+  setState("STANDBY");
+  activity.textContent="Microphone error. Check permissions.";
+ };
+ recognition.onend=function(){
+  if(state.textContent==="LISTENING")setState("STANDBY");
+ };
+ recognition.start();
+}
+
+function showMessage(text){
+ reply(text);
+}
+</script>
+
 </body>
 </html>
